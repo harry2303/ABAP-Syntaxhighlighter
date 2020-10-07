@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="ABP Syntax highlighter">
+<meta name="author" content="Harald Schütt">
+
+<title>ABAP syntax highlighter by prism.js</title>
+
+<!-- Bootstrap Core CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<!-- Prism Core CSS -->
+<link href="prism.css" rel="stylesheet" />
+
+<!-- Custom CSS -->
+<style>
+    textarea {
+        width: 100%;
+        height: 8em;
+        padding: 1em;
+        box-sizing: border-box;
+        border-style: dashed;
+        border-width: thin;
+        border-color: black;
+        background: white;
+        background-image: url(blueprint-dark.png);
+        background-size: auto;
+        color: dodgerblue;
+        text-shadow: 0px 1px silver;
+        tab-size: 4;
+        font: 1em 'Source Code Pro', Consolas, Monaco, monospace;
+        white-space: pre;
+        outline: none;
+    }
+</style>
+</head>
+
+<body class="line-numbers"> <!-- enabled for the whole page -->
+
+<header class="container">
+	<h1>ABAP syntax highlighter</h1>
+	<p>based on <a target="_blank" href="http://prismjs.com">prism.js</a></p>
+</header>
+
+<div class="container">
+<section>
+
+<textarea id="source" autofocus autocomplete="off" onkeyup="highlight(this)">
+  REPORT zdtpload.
+
+  TABLES: rsbkdtpt.
+   
+  DATA: lcl_dtp TYPE REF TO cl_rsbk_dtp,
+        lcl_request TYPE REF TO cl_rsbk_request,
+        lcl_filter TYPE REF TO cl_rsbc_filter,
+        w_loc_dtp TYPE rsbkdtpnm,
+        lv_dtps TYPE TABLE OF rsbkdtpnm.
+        w_loc_dtp = 'DTP ID'.
+        lcl_dtp = cl_rsbk_dtp=>factory( w_loc_dtp ).
+    
+  TRY.
+    CALL METHOD lcl_dtp->if_rsbk_dtp_execute~create_request
+           RECEIVING
+             r_r_request = lcl_request.
+   CATCH cx_rs_not_found .
+   CATCH cx_rs_foreign_lock .
+   CATCH cx_rs_failed .
+  ENDTRY.
+    
+  TRY.
+    CALL METHOD lcl_request->if_rsbk_request~doit
+          EXPORTING
+           i_no_commit = rs_c_false.
+   CATCH cx_rs_failed . 
+  ENDTRY.
+</textarea>
+<strong>Result:</strong>
+<pre><code id="target" class="language-abap"></code></pre>
+
+</section>
+</div>
+
+<!-- Custom JavaScript functions -->
+<script>
+function highlight(srcsql){
+
+    var target = document.getElementById("target");
+
+    target.innerHTML = srcsql.value.toUpperCase();
+    Prism.highlightAll();
+    };
+</script>
+
+<!-- js libraries at bottom of body tag for performance reasons -->
+<script src="prism.js" data-default-language="sql"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</body>
+</html>
